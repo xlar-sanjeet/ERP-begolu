@@ -331,10 +331,12 @@ elif tab == "del_entry":
                     real_time_updated.at[idx, "Quantity"] = new_qty
                     real_time_updated.at[idx, "Size"] = new_size_str
 
-
-                conn.update(worksheet="real_time_inventory", data=real_time_updated)
-                st.success(f"✅ Deleted:{category}, {size}, {quantity}")
+    if st.button("check"):
+            conn.update(worksheet="real_time_inventory", data=real_time_updated)
+            st.success(f"✅ Deleted:{category}, {size}, {quantity}")
             
+    else:
+        st.error("Not available")                             
 
 else:
     st.markdown("Enter the details of date range to access sales history")
