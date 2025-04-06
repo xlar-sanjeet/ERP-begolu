@@ -26,10 +26,13 @@ def fetch_data():
 conn, inv_ws, real_time, sell_ws = fetch_data()
 
 
-num_kurtis = inv_ws.value_counts("Category")["Kurti"]
-num_sarees = inv_ws.value_counts("Category")["Saree"]
-num_jewels = inv_ws.value_counts("Category")["Jewellery"]
-num_shoes = inv_ws.value_counts("Category")["Shoes"]
+try:
+    num_kurtis = inv_ws.value_counts("Category")["Kurti"]
+    num_sarees = inv_ws.value_counts("Category")["Saree"]
+    num_jewels = inv_ws.value_counts("Category")["Jewellery"]
+    num_shoes = inv_ws.value_counts("Category")["Shoes"]
+except KeyError:
+    num_kurtis,num_sarees,num_jewels,num_shoes = 0,0,0,0
 # NUM = 0
 
 
@@ -128,7 +131,7 @@ if tab == "Inventory":
             new_row = pd.DataFrame([{
                         "Category":category,
                         "Code": code,
-                        "Size": size if isinstance(size, str) else ", ".join(str(size)),
+                        "Size": size if isinstance(size, str) else ",".join(size),
                         "Color": color,
                         "Quantity": quantity,
                         "Cost Price": cost_price,
