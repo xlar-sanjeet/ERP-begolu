@@ -87,7 +87,7 @@ SHOES = ["5", "6", "7", "8", "9","10", "11", "12", "13", "14","37","38", "39", "
 COLORS = ["ORANGE","WHITE","RED","DARK_BLUE","SKY_BLUE","YELLOW","GREEN","GREY","PURPLE","PEA_GREEN","BLACK","MAROON","PINK"]
 
 # Sidebar menu
-tab = st.sidebar.radio("Menu", ["Inventory", "Sell", "Sales History", "product info"], key="menu_radio")
+tab = st.sidebar.radio("Menu", ["Inventory", "Sell", "Sales History", "product info", "del_entry"], key="menu_radio")
 
 if tab == "Inventory":
     # st.subheader("Add New Item")
@@ -272,7 +272,44 @@ elif tab == "product info":
         if old_qty and old_size:
             st.success(f"✅ Quantiy:{old_qty}, Size: {old_size}")
         else:
-            st.error("Not available")    
+            st.error("Not available") 
+
+elif tab == "del_entry":
+
+    category = st.selectbox("Select Product Category", PRODUCTS)
+
+    # Dynamically show size options
+    size = None
+    if category == "Kurti":
+        size = st.multiselect("Select kurti Sizes", options=KURTI_SIZES, key="kurti")
+        quantity = len(size)
+    elif category == "Saree":
+        size = st.selectbox("Select num-Colors", options=SAREE_COLORS, key="saree")
+        quantity = int(size)
+    elif category == "Jewellery":
+        size = st.selectbox("Select num-Jewellery", options=JEWELS, key="jewels")
+        quantity = int(size)
+    elif category == "Shoes":
+        size = st.multiselect("Select Shoe Size", options=SHOES, key="shoes")
+        quantity = len(size)
+
+    color = st.selectbox("Select color", options = COLORS)
+
+    num = st.text_input("Add the identity number")
+
+    code = gen_code(category, color, id_num = num, BorS = "Sell")
+
+    if st.button("Submit"):
+        if category and size:
+            real_time_updated = real_time.copy()
+
+            if code in real_time_updated["Code"].values:
+                idx = real_time_updated[real_time_updated["Code"] == code].index[0]
+
+                real_time_updated = real_time_updated.drop(index=idx)
+                conn.update(worksheet="real_time_inventory", data=real_time_updated)
+                st.success(f"✅ Deleted:{category}, {size}, {quantity}")
+            
 
 else:
     start = st.date_input("Enter start date for analysing profit and revenue ", datetime.date(2025, 4, 6), min_value = datetime.date(2025, 4, 6))
@@ -285,6 +322,12 @@ else:
     mask = (sell_ws["Date Added"].dt.date >= start) & (sell_ws["Date Added"].dt.date <= end)
     date_range = sell_ws.loc[mask]
 
+    inv_ws["Date Added"] = pd.to_datetime(inv_ws["Date Added"])
+     # Filter by date range
+    mask_inv = (inv_ws["Date Added"].dt.date >= start) & (inv_ws["Date Added"].dt.date <= end)
+    inv_date_range = inv_ws.loc[mask_inv]
+
+
     # Calculate metrics
     if not date_range.empty:
         try:
@@ -292,6 +335,10 @@ else:
             date_range["Revenue"] = pd.to_numeric(date_range["Sell Price"], errors="coerce")
             total_profit = date_range["Profit"].sum()
             total_revenue = date_range["Revenue"].sum()
+
+            inv_date_range["Total Price"] = pd.to_numeric(inv_date_range["Total Price"], errors="coerce")
+            total_investment = inv_date_range["Total Price"].sum()
+
         except KeyError:
             total_profit = total_revenue = 0
     else:
@@ -300,7 +347,7 @@ else:
     # Show results
     if st.button("Calculate"):
         if total_profit or total_revenue:
-            st.success(f"📅 Start: `{start}` → End: `{end}` \n\n💰 Total Profit: **₹{total_profit:.2f}**  \n📈 Total Revenue: **₹{total_revenue:.2f}**")
+            st.success(f"📅 Start: `{start}` → End: `{end}` \n\n💰 Total Investment: **₹{total_investment:.2f}**  \n💰 Total Profit: **₹{total_profit:.2f}**  \n📈 Total Revenue: **₹{total_revenue:.2f}**")
         else:
             st.error("No data available for the selected range.")
 
