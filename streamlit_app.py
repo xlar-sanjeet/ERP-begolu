@@ -2,6 +2,7 @@ import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
 import datetime
+import math
 
 
 
@@ -199,8 +200,8 @@ elif tab == "Sell":
                 old_qty = real_time_updated.at[idx, "Quantity"]
                 old_size = real_time_updated.at[idx, "Size"]
                 cost_price = real_time_updated.at[idx, "Cost Price"]
-                profit = (int(sell_price) - int(cost_price)) * quantity
-                profit_cent = profit/cost_price * 100
+                profit = math.ceil(((int(sell_price) - int(cost_price)) * quantity))
+                profit_cent = math.ceil((profit/cost_price * 100))
 
                 # Convert old sizes to a list
                 if category == "Kurti" or category == "Shoes":
