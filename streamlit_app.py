@@ -180,9 +180,9 @@ elif tab == "Sell":
     sell_price = st.text_input("Enter price")
 
     try:
-        total_price = float(sell_price) * quantity
+        total_sell_price = float(sell_price) * quantity
     except ValueError:
-        total_price = 0
+        total_sell_price = 0
 
     code = gen_code(category, color, id_num = num, BorS = "Sell")
 
@@ -199,7 +199,7 @@ elif tab == "Sell":
                 old_qty = real_time_updated.at[idx, "Quantity"]
                 old_size = real_time_updated.at[idx, "Size"]
                 cost_price = real_time_updated.at[idx, "Cost Price"]
-                profit = int(sell_price) - int(cost_price)
+                profit = (int(sell_price) - int(cost_price)) * quantity
                 profit_cent = profit/cost_price * 100
 
                 # Convert old sizes to a list
@@ -232,7 +232,7 @@ elif tab == "Sell":
                         "Cost Price": cost_price,
                         "Profit": profit,
                         "Profit Cent": str(profit_cent) + " %" ,
-                        "Total Price": total_price,
+                        "Revenue": total_sell_price,
                         "Date Added" : pd.Timestamp.now().strftime("%Y-%m-%d"),
                                         }])    
 
@@ -288,9 +288,9 @@ else:
     if not date_range.empty:
         try:
             date_range["Profit"] = pd.to_numeric(date_range["Profit"], errors="coerce")
-            date_range["Sell Price"] = pd.to_numeric(date_range["Sell Price"], errors="coerce")
+            date_range["Revenue"] = pd.to_numeric(date_range["Sell Price"], errors="coerce")
             total_profit = date_range["Profit"].sum()
-            total_revenue = date_range["Sell Price"].sum()
+            total_revenue = date_range["Revenue"].sum()
         except KeyError:
             total_profit = total_revenue = 0
     else:
