@@ -10,7 +10,6 @@ import math
 # Display title and description
 
 st.title("Begolu Mal Check by xlar")
-st.markdown("Enter the details of the new product below")
 
 # Establishing a google sheets connection
 # Clear Streamlit's cache for the connection
@@ -91,6 +90,7 @@ tab = st.sidebar.radio("Menu", ["Inventory", "Sell", "Sales History", "product i
 
 if tab == "Inventory":
     # st.subheader("Add New Item")
+    st.markdown("Enter the details of the new product below")
 
     # item = st.text_input("Item name")
     category = st.selectbox("Select Product Category", PRODUCTS)
@@ -156,6 +156,7 @@ if tab == "Inventory":
 
 
 elif tab == "Sell":
+    st.markdown("Enter the details of the sold product below")
     # item = st.text_input("Item name")
     category = st.selectbox("Select Product Category", PRODUCTS)
 
@@ -251,6 +252,7 @@ elif tab == "Sell":
             st.error("❌ Please fill in all fields before submitting.")
 
 elif tab == "product info":
+    st.markdown("Enter the details of the product below")
     # item = st.text_input("Item name")
     category = st.selectbox("Select Product Category", PRODUCTS)
 
@@ -275,6 +277,7 @@ elif tab == "product info":
             st.error("Not available") 
 
 elif tab == "del_entry":
+    st.markdown("Enter the details of the product to be deleted below")
 
     category = st.selectbox("Select Product Category", PRODUCTS)
 
@@ -299,21 +302,45 @@ elif tab == "del_entry":
 
     code = gen_code(category, color, id_num = num, BorS = "Sell")
 
-    if st.button("Submit"):
-        if category and size:
-            real_time_updated = real_time.copy()
+    real_time_updated = real_time.copy()
 
-            if code in real_time_updated["Code"].values:
+    if code in real_time_updated["Code"].values:
                 idx = real_time_updated[real_time_updated["Code"] == code].index[0]
 
-                real_time_updated = real_time_updated.drop(index=idx)
+                # Original Data
+                old_qty = real_time_updated.at[idx, "Quantity"]
+                old_size = real_time_updated.at[idx, "Size"]
+
+                # Convert old sizes to a list
+                if category == "Kurti" or category == "Shoes":
+                    old_sizes_list = [s.strip() for s in old_size.split(",")]
+                    sold_sizes = size if isinstance(size, list) else [size]
+                    # New sizes = remove sold ones
+                    new_sizes_list = [s for s in old_sizes_list if s not in sold_sizes]
+
+                    # Update the values
+                    new_qty = max(0, int(old_qty) - quantity)
+                    new_size_str = ", ".join(new_sizes_list)
+                else:
+                    new_qty = max(0, int(old_qty) - quantity)
+                    new_size_str = str(new_qty)
+
+                if new_qty == 0:
+                    real_time_updated = real_time_updated.drop(index=idx)
+                else:
+                    real_time_updated.at[idx, "Quantity"] = new_qty
+                    real_time_updated.at[idx, "Size"] = new_size_str
+
+
                 conn.update(worksheet="real_time_inventory", data=real_time_updated)
                 st.success(f"✅ Deleted:{category}, {size}, {quantity}")
             
 
 else:
-    start = st.date_input("Enter start date for analysing profit and revenue ", datetime.date(2025, 4, 6), min_value = datetime.date(2025, 4, 6))
-    end = st.date_input("Enter End date for analysing profit and revenue ", "today", max_value = "today")
+    st.markdown("Enter the details of date range to access sales history")
+
+    start = st.date_input("Enter start date", datetime.date(2025, 4, 6), min_value = datetime.date(2025, 4, 6))
+    end = st.date_input("Enter End date", "today", max_value = "today")
 
     # Convert the column to datetime if not already
     sell_ws["Date Added"] = pd.to_datetime(sell_ws["Date Added"])
