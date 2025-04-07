@@ -27,16 +27,17 @@ conn, inv_ws, real_time, sell_ws = fetch_data()
 
 
 try:
-    num_kurtis = inv_ws.value_counts("Category")["Kurti"]
-    num_sarees = inv_ws.value_counts("Category")["Saree"]
-    num_jewels = inv_ws.value_counts("Category")["Jewellery"]
-    num_shoes = inv_ws.value_counts("Category")["Shoes"]
+    num_kurtis = inv_ws["Category"].value_counts().get("Kurti", 0)
+    num_sarees = inv_ws["Category"].value_counts().get("Saree", 0)
+    num_jewels = inv_ws["Category"].value_counts().get("Jewellery", 0)
+    num_shoes = inv_ws["Category"].value_counts().get("Shoes", 0)
 except KeyError:
+    print("error")
     num_kurtis,num_sarees,num_jewels,num_shoes = 0,0,0,0
 # NUM = 0
 
 
-def gen_code(ptype,color, id_num = 0, BorS = "Buy"):
+def gen_code(ptype,color, id_num = 1, BorS = "Buy"):
     global NUM 
     NUM = id_num
     # print(NUM)
