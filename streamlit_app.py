@@ -255,7 +255,7 @@ elif tab == "Sell":
                 st.success("✅ Added to inventory and saved to Google Sheet!")
 
             else:
-                st.error("❌ Product Code not found. Please fill in the correct details.deac")
+                st.error("❌ Product Code not found. Please fill in the correct details")
 
         else:
             st.error("❌ Please fill in all fields before submitting.")
