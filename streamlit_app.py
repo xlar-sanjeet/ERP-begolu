@@ -194,7 +194,7 @@ elif tab == "Sell":
 
     if st.button("Submit"):
         if category and size:
-            st.success(f"✅ Added:{category}, {size}, {quantity}")
+            
 
             real_time_updated = real_time.copy()
 
@@ -249,6 +249,7 @@ elif tab == "Sell":
                 
                 # Push to google sheet
                 conn.update(worksheet="sell", data=updated_sell)
+                st.success(f"✅ Added:{category}, {size}, {quantity}")
                 conn.update(worksheet="real_time_inventory", data=real_time_updated)
                 
                 
