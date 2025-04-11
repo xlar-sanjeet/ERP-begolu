@@ -228,30 +228,35 @@ elif tab == "Sell":
                     real_time_updated.at[idx, "Quantity"] = new_qty
                     real_time_updated.at[idx, "Size"] = new_size_str
 
-            new_row = pd.DataFrame([{
-                        "Category":category,
-                        "Code": code,
-                        "Size": size if isinstance(size, str) else ", ".join(size),
-                        "Color": color,
-                        "Quantity": quantity,
-                        "Sell Price": sell_price,
-                        "Cost Price": cost_price,
-                        "Profit": profit,
-                        "Profit Cent": str(profit_cent) + " %" ,
-                        "Revenue": total_sell_price,
-                        "Date Added" : pd.Timestamp.now().strftime("%Y-%m-%d"),
-                                        }])    
+                    
+                new_row = pd.DataFrame([{
+                            "Category":category,
+                            "Code": code,
+                            "Size": size if isinstance(size, str) else ", ".join(size),
+                            "Color": color,
+                            "Quantity": quantity,
+                            "Sell Price": sell_price,
+                            "Cost Price": cost_price,
+                            "Profit": profit,
+                            "Profit Cent": str(profit_cent) + " %" ,
+                            "Revenue": total_sell_price,
+                            "Date Added" : pd.Timestamp.now().strftime("%Y-%m-%d"),
+                                            }])    
 
-            # Combine with existing data and remove empty rows
-            updated_sell = pd.concat([sell_ws.dropna(how='all'), new_row], ignore_index=True)
-            
-            
-            # Push to google sheet
-            conn.update(worksheet="sell", data=updated_sell)
-            conn.update(worksheet="real_time_inventory", data=real_time_updated)
-            
-            
-            st.success("✅ Added to inventory and saved to Google Sheet!")
+                # Combine with existing data and remove empty rows
+                updated_sell = pd.concat([sell_ws.dropna(how='all'), new_row], ignore_index=True)
+                
+                
+                # Push to google sheet
+                conn.update(worksheet="sell", data=updated_sell)
+                conn.update(worksheet="real_time_inventory", data=real_time_updated)
+                
+                
+                st.success("✅ Added to inventory and saved to Google Sheet!")
+
+            else:
+                st.error("❌ Product Code not found. Please fill in the correct details.deac")
+
         else:
             st.error("❌ Please fill in all fields before submitting.")
 
